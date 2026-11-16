@@ -77,7 +77,7 @@ GUIDANCE: dict[str, ClassGuidance] = {
         material_icon="package",
         instructions_en="Flatten the box and keep it dry. Remove tape and food residue if you can.",
         instructions_th="พับกล่องให้แบนและเก็บให้แห้ง แกะเทปและเศษอาหารออกถ้าทำได้",
-        **_RECYCLABLE,
+        **{**_RECYCLABLE, "accent": "#8F4A28"},
     ),
     "glass": ClassGuidance(
         key="glass",
@@ -86,7 +86,7 @@ GUIDANCE: dict[str, ClassGuidance] = {
         material_icon="wine",
         instructions_en="Empty and rinse. Wrap broken glass safely before disposing of it.",
         instructions_th="เทของเหลวออกและล้างให้สะอาด ห่อเศษแก้วแตกให้มิดชิดก่อนทิ้ง",
-        **_RECYCLABLE,
+        **{**_RECYCLABLE, "accent": "#276080"},
     ),
     "metal": ClassGuidance(
         key="metal",
@@ -95,7 +95,7 @@ GUIDANCE: dict[str, ClassGuidance] = {
         material_icon="cylinder",
         instructions_en="Empty and rinse cans and tins. Flatten them if it is safe to do so.",
         instructions_th="เทของเหลวออกและล้างกระป๋อง บีบให้แบนถ้าปลอดภัย",
-        **_RECYCLABLE,
+        **{**_RECYCLABLE, "accent": "#4A5760"},
     ),
     "paper": ClassGuidance(
         key="paper",
@@ -104,7 +104,7 @@ GUIDANCE: dict[str, ClassGuidance] = {
         material_icon="file-text",
         instructions_en="Keep it clean and dry. Greasy or heavily soiled paper may not be accepted.",
         instructions_th="เก็บให้สะอาดและแห้ง กระดาษที่เปื้อนน้ำมันหรืออาหารมากอาจรีไซเคิลไม่ได้",
-        **_RECYCLABLE,
+        **{**_RECYCLABLE, "accent": "#7A5F0A"},
     ),
     "plastic": ClassGuidance(
         key="plastic",
@@ -113,7 +113,7 @@ GUIDANCE: dict[str, ClassGuidance] = {
         material_icon="cup-soda",
         instructions_en="Empty, rinse and dry. Check which plastic types your local service accepts.",
         instructions_th="เทของเหลวออก ล้างและผึ่งให้แห้ง ตรวจสอบประเภทพลาสติกที่รับรีไซเคิลในพื้นที่ของคุณ",
-        **_RECYCLABLE,
+        **{**_RECYCLABLE, "accent": "#2F6B3D"},
     ),
     "trash": ClassGuidance(
         key="trash",
@@ -122,7 +122,7 @@ GUIDANCE: dict[str, ClassGuidance] = {
         material_icon="trash",
         instructions_en="Items that cannot be recycled or are heavily soiled go here. Check for special collection rules.",
         instructions_th="ของที่รีไซเคิลไม่ได้หรือเปื้อนมากให้ทิ้งที่นี่ ตรวจสอบว่ามีการเก็บแยกเป็นพิเศษหรือไม่",
-        **_GENERAL,
+        **{**_GENERAL, "accent": "#3B3B3B"},
     ),
 }
 

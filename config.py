@@ -18,10 +18,10 @@ ALLOWED_EXTENSIONS = ("jpg", "jpeg", "png")
 CLASS_LABELS = ("cardboard", "glass", "metal", "paper", "plastic", "trash")
 
 # Brand palette.
-FOREST_GREEN = "#356B55"
-SAGE_MIST = "#E4ECE5"
-WARM_CREAM = "#F5F7F2"
-DEEP_GREEN = "#20362D"
+FOREST_GREEN = "#14232F"
+SAGE_MIST = "#DCE3E8"
+WARM_CREAM = "#EEF2F4"
+DEEP_GREEN = "#14232F"
 
 MODE_DEMO = "demo"
 MODE_MODEL = "model"

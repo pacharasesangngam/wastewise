@@ -5,7 +5,7 @@ from __future__ import annotations
 import streamlit as st
 
 from ..config import ALLOWED_EXTENSIONS
-from ..session import STATUS_DONE, WasteWiseSession
+from ..session import WasteWiseSession
 from . import browser_camera
 from . import html
 
@@ -21,11 +21,6 @@ def _on_upload(session: WasteWiseSession) -> None:
     files = st.session_state.get(key) or []
     session.add_files((f.name, f.getvalue()) for f in files)
     session.uploader_nonce += 1  # fresh, empty uploader on the next run
-
-
-def _on_reset(session: WasteWiseSession) -> None:
-    session.reset()
-    st.session_state["webcam_open"] = False
 
 
 def _toggle_webcam() -> None:
@@ -53,73 +48,67 @@ def render(session: WasteWiseSession) -> bool:
                     args=(session,),
                 )
 
-    area_key = "upload_area_grid" if session.images else "upload_area_empty"
-    with st.container(key=area_key, border=bool(session.images)):
-        if session.images:
-            st.markdown(html.count_html(len(session.images)), unsafe_allow_html=True)
-            tiles = list(session.images)
+    with st.container(key="upload_dock"):
+        st.markdown(f'<div class="ww-dock-header"><div class="ww-dock-heading">Add photos</div><div class="ww-dock-sub">Up to 5 · เลือกได้ไม่เกิน 5 รูป</div></div>', unsafe_allow_html=True)
+        area_key = "upload_area_grid" if session.images else "upload_area_empty"
+        with st.container(key=area_key, border=bool(session.images)):
+            if session.images:
+                st.markdown(html.count_html(len(session.images)), unsafe_allow_html=True)
+                tiles = list(session.images)
+                if not session.is_full:
+                    tiles.append(None)
+                for start in range(0, len(tiles), 3):
+                    cols = st.columns(3, gap="small")
+                    for col, img in zip(cols, tiles[start : start + 3]):
+                        with col:
+                            if img is None:
+                                with st.container(key="add_image_tile"):
+                                    st.file_uploader("Add image", type=list(ALLOWED_EXTENSIONS), accept_multiple_files=True,
+                                        key=f"uploader_{session.uploader_nonce}", on_change=_on_upload, args=(session,), label_visibility="collapsed")
+                            else:
+                                with st.container(key=f"thumb_card_{img.id}"):
+                                    st.markdown(html.thumb_html(img), unsafe_allow_html=True)
+                                    st.button("", key=f"rm_{img.id}", help=f"Remove {img.name}", icon=":material/close:", on_click=session.remove, args=(img.id,))
+            else:
+                st.file_uploader("Upload images", type=list(ALLOWED_EXTENSIONS), accept_multiple_files=True,
+                    key=f"uploader_{session.uploader_nonce}", on_change=_on_upload, args=(session,), label_visibility="collapsed")
+
+        if session.is_full:
+            st.session_state["webcam_open"] = False
+        action_camera, action_identify = st.columns(2, gap="small")
+        with action_camera:
             if not session.is_full:
-                tiles.append(None)
-            for start in range(0, len(tiles), 3):
-                cols = st.columns(3, gap="small")
-                for col, img in zip(cols, tiles[start : start + 3]):
-                    with col:
-                        if img is None:
-                            with st.container(key="add_image_tile"):
-                                st.file_uploader(
-                                    "Add image",
-                                    type=list(ALLOWED_EXTENSIONS),
-                                    accept_multiple_files=True,
-                                    key=f"uploader_{session.uploader_nonce}",
-                                    on_change=_on_upload,
-                                    args=(session,),
-                                    label_visibility="collapsed",
-                                )
-                        else:
-                            with st.container(key=f"thumb_card_{img.id}"):
-                                st.markdown(html.thumb_html(img), unsafe_allow_html=True)
-                                st.button(
-                                    "",
-                                    key=f"rm_{img.id}",
-                                    help=f"Remove {img.name}",
-                                    icon=":material/close:",
-                                    on_click=session.remove,
-                                    args=(img.id,),
-                                )
-        else:
-            st.file_uploader(
-                "Upload images",
-                type=list(ALLOWED_EXTENSIONS),
-                accept_multiple_files=True,
-                key=f"uploader_{session.uploader_nonce}",
-                on_change=_on_upload,
-                args=(session,),
-                label_visibility="collapsed",
-            )
+                st.button("Use webcam", key="webcam_toggle", icon=":material/videocam:", on_click=_toggle_webcam, use_container_width=True)
+        with action_identify:
+            run_requested = st.button("Identify waste", key="classify_btn", type="primary", use_container_width=True, disabled=not session.images)
+        return run_requested
 
-    if session.is_full:
-        st.session_state["webcam_open"] = False
 
-    if not session.is_full:
-        webcam_open = st.session_state.get("webcam_open", False)
-        st.button(
-            "Close webcam" if webcam_open else "Use webcam",
-            key="webcam_toggle",
-            icon=":material/videocam_off:" if webcam_open else ":material/videocam:",
-            on_click=_toggle_webcam,
-            use_container_width=True,
-        )
-        if webcam_open:
+def render_camera(session: WasteWiseSession) -> bool:
+    """Camera capture view with the native camera widget and photo queue."""
+    head_brand, head_close = st.columns([3, 1], gap="small", vertical_alignment="center")
+    with head_brand:
+        st.markdown(html.camera_brand_html(), unsafe_allow_html=True)
+    with head_close:
+        st.button("Close camera · ปิดกล้อง", key="camera_close", on_click=lambda: setattr(st.session_state, "webcam_open", False), use_container_width=True)
+    frame, queue = st.columns([3, 1], gap="large")
+    with frame:
+        with st.container(key="camera_frame"):
+            st.markdown('<div class="ww-camera-live"><i></i>Live</div>', unsafe_allow_html=True)
+            st.markdown('<div class="ww-camera-prompt"><strong>Place one item in the frame</strong><span>วางสิ่งของ 1 ชิ้นในกรอบ</span></div>', unsafe_allow_html=True)
             browser_camera.render(session)
-
-    completed = session.status == STATUS_DONE
-    return st.button(
-        "Start over" if completed else "Identify waste",
-        key="classify_btn",
-        type="secondary" if completed else "primary",
-        use_container_width=True,
-        icon=":material/refresh:" if completed else None,
-        disabled=not session.images,
-        on_click=_on_reset if completed else None,
-        args=(session,) if completed else (),
-    )
+    with queue:
+        with st.container(key="camera_queue"):
+            st.markdown(f'<div class="ww-captured-title"><strong>Captured</strong><span>{len(session.images)} of 5 · {len(session.images)} จาก 5</span></div>', unsafe_allow_html=True)
+            if session.images:
+                cols = st.columns(min(5, len(session.images)), gap="small")
+                for col, img in zip(cols, session.images):
+                    with col:
+                        st.image(img.preview)
+            st.markdown(f'<div class="ww-camera-count">{len(session.images)} of 5</div>', unsafe_allow_html=True)
+            st.markdown('<div class="ww-camera-tip">Tip: good light and one item at a time work best.<br>เคล็ดลับ: แสงสว่างและวางทีละชิ้นจะแม่นยำที่สุด</div>', unsafe_allow_html=True)
+            if session.images and st.button(f"Identify {len(session.images)} photo" if len(session.images) == 1 else f"Identify {len(session.images)} photos", key="camera_identify", type="primary", use_container_width=True):
+                return True
+            if st.button("Done", key="camera_done", use_container_width=True, on_click=lambda: setattr(st.session_state, "webcam_open", False)):
+                return False
+    return False

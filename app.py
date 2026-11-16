@@ -15,22 +15,21 @@ st.markdown(theme.style_tag(), unsafe_allow_html=True)
 if "wastewise_session" not in st.session_state:
     st.session_state.wastewise_session = WasteWiseSession()
 session = st.session_state.wastewise_session
+if "wastewise_view" not in st.session_state:
+    st.session_state.wastewise_view = "upload"
 
-st.markdown(html.header_html(config.classifier_mode() == config.MODE_DEMO), unsafe_allow_html=True)
-left, right = st.columns([0.86, 1.14], gap="large")
-with left:
-    with st.container(key="left_panel"):
-        st.markdown(
-            '<div class="ww-section-head"><div class="ww-section-title">Add photos</div>'
-            '<div class="ww-section-sub">Choose up to five photos · เลือกได้ไม่เกิน 5 รูป</div></div>',
-            unsafe_allow_html=True,
-        )
-        run_requested = upload_panel.render(session)
-with right:
-    with st.container(key="right_panel"):
-        st.markdown(
-            '<div class="ww-section-head"><div class="ww-section-title">Sorting results</div>'
-            '<div class="ww-section-sub">Material, bin, and prep tips · ประเภทขยะ ถัง และวิธีเตรียม</div></div>',
-            unsafe_allow_html=True,
-        )
-        results_panel.render(session, run_requested)
+if st.session_state.get("webcam_open", False) and not session.is_full:
+    run_requested = upload_panel.render_camera(session)
+    if run_requested:
+        results_panel.render_home(session, True)
+elif session.status == "done" and st.session_state.wastewise_view == "results":
+    results_panel.render_results(session, config.classifier_mode() == config.MODE_DEMO)
+else:
+    st.markdown(html.header_html(config.classifier_mode() == config.MODE_DEMO), unsafe_allow_html=True)
+    copy, intake = st.columns([1, 1], gap="large", vertical_alignment="center")
+    with copy:
+        st.markdown(html.hero_html(), unsafe_allow_html=True)
+    with intake:
+        with st.container(key="left_panel"):
+            run_requested = upload_panel.render(session)
+    results_panel.render_home(session, run_requested)

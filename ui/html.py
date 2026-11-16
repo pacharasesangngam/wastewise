@@ -44,17 +44,44 @@ def header_html(demo: bool) -> str:
             </div>
             {mode_badge}
           </div>
-          <div class="ww-hero">
-            <h1>Give each item<br/>the right next stop.</h1>
-            <p>Add a photo to see what it is, which bin to use, and how to prepare it.<span class="ww-hero-th">ถ่ายรูปขยะเพื่อดูประเภทถังและวิธีเตรียมก่อนทิ้ง</span></p>
-          </div>
         </div>
         """
     )
 
 
+def hero_html() -> str:
+    return '<div class="ww-hero"><div><h1>Give each item<br/>the right next stop.</h1><p>Add a photo to see what it is, which bin to use, and how to prepare it.<span class="ww-hero-th">ถ่ายรูปขยะเพื่อดูประเภท ถังที่ใช้ และวิธีเตรียมก่อนทิ้ง</span></p></div></div>'
+
+
 def count_html(n: int) -> str:
     return f'<div class="ww-count">{n} / {MAX_IMAGES} images</div>'
+
+
+def results_brand_html(demo: bool) -> str:
+    label = "Sample mode" if demo else "Trained model"
+    return f'<div class="ww-brand"><div class="ww-logo">{icons.svg("recycle",23,"#FFFFFF")}</div><div class="ww-brand-name">{escape(APP_NAME)}</div><span class="ww-results-model">{label}</span></div>'
+
+
+def results_title_html(count: int) -> str:
+    return f'<div class="ww-results-title"><h1><span class="ww-title-desktop">Sorted. Here is where each item goes.</span><span class="ww-title-mobile">Sorted. Here is where each goes.</span></h1><p><span class="ww-count-desktop">{count} items found · แยกประเภทได้ {count} ชิ้น</span><span class="ww-count-mobile">{count} items · แยกได้ {count} ชิ้น</span></p></div>'
+
+
+def camera_brand_html() -> str:
+    return f'<div class="ww-brand ww-camera-brand"><div class="ww-logo">{icons.svg("recycle",23,"#F2C230")}</div><div class="ww-brand-name">{escape(APP_NAME)}</div></div>'
+
+
+def result_summary_html(result: ClassificationResult) -> str:
+    g = get_guidance(result.predicted)
+    tips = {
+        "cardboard": (("Flatten the box", "พับกล่องให้แบน"), ("Remove tape and food residue", "แกะเทปและเศษอาหารออกถ้าทำได้"), ("Keep it dry", "เก็บให้แห้ง")),
+        "glass": (("Empty and rinse", "เทของเหลวออกและล้างให้สะอาด"), ("Wrap broken glass safely", "ห่อเศษแก้วแตกให้มิดชิดก่อนทิ้ง")),
+        "metal": (("Empty and rinse cans and tins", "เทของเหลวออกและล้างกระป๋อง"), ("Flatten if it is safe", "บีบให้แบนถ้าปลอดภัย")),
+        "paper": (("Keep it clean and dry", "เก็บให้สะอาดและแห้ง"), ("Greasy paper may not be accepted", "กระดาษเปื้อนน้ำมันมากอาจรีไซเคิลไม่ได้")),
+        "plastic": (("Empty, rinse and dry", "เทของเหลวออก ล้างและผึ่งให้แห้ง"), ("Check accepted plastic types locally", "ตรวจสอบประเภทพลาสติกที่รับในพื้นที่")),
+        "trash": (("Use for items that cannot be recycled", "ใช้กับสิ่งของที่รีไซเคิลไม่ได้"), ("Check for special collection rules", "ตรวจสอบกฎการเก็บแยกเป็นพิเศษ")),
+    }
+    li = "".join(f'<li><span>{escape(en)}</span><small>{escape(th)}</small></li>' for en, th in tips[result.predicted])
+    return _flat(f'''<div class="ww-result-summary"><h2>{escape(g.name_en)}<span>{escape(g.name_th)}</span></h2><ul class="ww-prep-list">{li}</ul></div>''')
 
 
 def thumb_html(image: SelectedImage) -> str:
@@ -85,16 +112,8 @@ def empty_state_html(selected: int) -> str:
         if selected
         else "Choose a photo or open the camera. We’ll show its material and where it goes."
     )
-    material_colors = {
-        "cardboard": "#B66D3F",
-        "glass": "#478C9D",
-        "metal": "#7B878C",
-        "paper": "#C0A83E",
-        "plastic": "#5B8B5D",
-        "trash": "#545D58",
-    }
     tiles = "".join(
-        f'<div class="ww-material-tile" style="--material:{material_colors[label]}">'
+        f'<div class="ww-material-tile ww-material-{label}" style="--material:{get_guidance(label).accent}">'
         f'<span class="ww-material-tile-icon">{icons.svg(get_guidance(label).material_icon, 18)}</span>'
         f'<span><b>{escape(get_guidance(label).name_en)}</b><small>{escape(get_guidance(label).name_th)}</small></span>'
         "</div>"
