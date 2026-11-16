@@ -30,22 +30,23 @@ def pct(value: float) -> str:
 def header_html(demo: bool) -> str:
     mode_badge = (
         f'<div class="ww-chip ww-chip-demo">{icons.svg("flask-conical", 14)}'
-        "<span><b>Sample mode</b> · preview data</span></div>"
+        "<span>Sample mode</span></div>"
         if demo
-        else ""
+        else '<div class="ww-chip ww-chip-live"><span class="ww-live-dot"></span><span>Trained model</span></div>'
     )
     return _flat(
         f"""
-        <div class="ww-header">
-          <div class="ww-logo">{icons.svg("recycle", 24, "#FFFFFF")}</div>
-          <div class="ww-brand">
-            <div class="ww-title">{escape(APP_NAME)}</div>
-            <div class="ww-tagline">From a quick photo to the right bin.</div>
-          </div>
-          <div class="ww-spacer"></div>
-          <div class="ww-header-meta">
-            <div class="ww-material-count">6 material types</div>
+        <div class="ww-page-head">
+          <div class="ww-header">
+            <div class="ww-brand">
+              <div class="ww-logo">{icons.svg("recycle", 23, "#FFFFFF")}</div>
+              <div class="ww-brand-name">{escape(APP_NAME)}</div>
+            </div>
             {mode_badge}
+          </div>
+          <div class="ww-hero">
+            <h1>Give each item<br/>the right next stop.</h1>
+            <p>Add a photo to see what it is, which bin to use, and how to prepare it.<span class="ww-hero-th">ถ่ายรูปขยะเพื่อดูประเภทถังและวิธีเตรียมก่อนทิ้ง</span></p>
           </div>
         </div>
         """
@@ -78,18 +79,36 @@ def notices_html(notices: list[str]) -> str:
 
 
 def empty_state_html(selected: int) -> str:
+    title = f"{selected} photo{'s' if selected != 1 else ''} ready" if selected else "Add a photo to begin"
     sub = (
-        f"{selected} image{'s' if selected != 1 else ''} selected. "
-        "Results will appear here after classification."
+        "Select Identify waste to see the material and bin guide for each photo."
         if selected
-        else "Upload images to get started."
+        else "Choose a photo or open the camera. We’ll show its material and where it goes."
+    )
+    material_colors = {
+        "cardboard": "#B66D3F",
+        "glass": "#478C9D",
+        "metal": "#7B878C",
+        "paper": "#C0A83E",
+        "plastic": "#5B8B5D",
+        "trash": "#545D58",
+    }
+    tiles = "".join(
+        f'<div class="ww-material-tile" style="--material:{material_colors[label]}">'
+        f'<span class="ww-material-tile-icon">{icons.svg(get_guidance(label).material_icon, 18)}</span>'
+        f'<span><b>{escape(get_guidance(label).name_en)}</b><small>{escape(get_guidance(label).name_th)}</small></span>'
+        "</div>"
+        for label in ("cardboard", "glass", "metal", "paper", "plastic", "trash")
     )
     return _flat(
         f"""
-        <div class="ww-state">
-          <div class="ww-state-icon">{icons.svg("image", 28)}</div>
-          <div class="ww-state-title">No results yet</div>
+        <div class="ww-empty-state">
+          <div class="ww-empty-copy">
+            <div class="ww-state-icon">{icons.svg("image", 25)}</div>
+            <div class="ww-state-title">{escape(title)}</div>
           <div class="ww-state-sub">{escape(sub)}</div>
+          </div>
+          <div class="ww-material-key">{tiles}</div>
         </div>
         """
     )
@@ -100,9 +119,9 @@ def error_state_html(message: str) -> str:
         f"""
         <div class="ww-state ww-state-error">
           <div class="ww-state-icon">{icons.svg("alert-circle", 28)}</div>
-          <div class="ww-state-title">We couldn’t classify your images</div>
+          <div class="ww-state-title">We couldn’t identify these items</div>
           <div class="ww-state-sub">{escape(message)}</div>
-          <div class="ww-state-sub">Your selected images are still here. You can try again.</div>
+          <div class="ww-state-sub">Your photos are still here. Choose Identify waste to try again.</div>
         </div>
         """
     )
@@ -114,7 +133,7 @@ def result_html(result: ClassificationResult) -> str:
     conf_label = "Sample confidence (demo)" if demo else "Model confidence"
     badge = (
         f'<div class="ww-chip ww-chip-demo">{icons.svg("flask-conical", 14)}'
-        f"<span><b>{DEMO_LABEL}</b> · sample data</span></div>"
+        f"<span><b>{DEMO_LABEL}</b></span></div>"
         if demo
         else ""
     )

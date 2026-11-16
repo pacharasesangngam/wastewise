@@ -11,15 +11,16 @@ from . import html
 
 
 def _run_classification(session: WasteWiseSession) -> None:
+    st.session_state["webcam_open"] = False
     holder = st.empty()
     with holder.container():
-        bar = st.progress(0.0, text="Preparing…")
+        bar = st.progress(0.0, text="Getting your results ready…")
 
         def on_progress(done: int, total: int) -> None:
             if done < total:
                 bar.progress(done / total, text=f"Classifying image {done + 1} of {total}…")
             else:
-                bar.progress(1.0, text="Done")
+                bar.progress(1.0, text="All items identified")
 
         session.classify(lambda: get_classifier(config.classifier_mode()), on_progress)
     holder.empty()
@@ -49,7 +50,7 @@ def render(session: WasteWiseSession, run_requested: bool) -> None:
         st.markdown(html.empty_state_html(len(session.images)), unsafe_allow_html=True)
         return
 
-    tabs = st.tabs([f"Image {pos + 1}" for pos, _, _ in entries])
+    tabs = st.tabs([f"Item {pos + 1}" for pos, _, _ in entries])
     for tab, (_, image, result) in zip(tabs, entries):
         with tab:
             _render_entry(image, result)

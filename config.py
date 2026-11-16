@@ -14,14 +14,14 @@ MAX_FILE_MB = 200
 MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024
 ALLOWED_EXTENSIONS = ("jpg", "jpeg", "png")
 
-# The six classes the future model will predict. Order is used as a tie-break.
+# The trained classifier predicts these six classes. Order is used as a tie-break.
 CLASS_LABELS = ("cardboard", "glass", "metal", "paper", "plastic", "trash")
 
 # Brand palette.
-FOREST_GREEN = "#397A54"
-SAGE_MIST = "#EDF4E9"
-WARM_CREAM = "#FAF8F0"
-DEEP_GREEN = "#263A2D"
+FOREST_GREEN = "#356B55"
+SAGE_MIST = "#E4ECE5"
+WARM_CREAM = "#F5F7F2"
+DEEP_GREEN = "#20362D"
 
 MODE_DEMO = "demo"
 MODE_MODEL = "model"

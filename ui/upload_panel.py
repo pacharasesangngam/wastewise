@@ -25,6 +25,11 @@ def _on_upload(session: WasteWiseSession) -> None:
 
 def _on_reset(session: WasteWiseSession) -> None:
     session.reset()
+    st.session_state["webcam_open"] = False
+
+
+def _toggle_webcam() -> None:
+    st.session_state["webcam_open"] = not st.session_state.get("webcam_open", False)
 
 
 def _dismiss_notices(session: WasteWiseSession) -> None:
@@ -92,15 +97,27 @@ def render(session: WasteWiseSession) -> bool:
                 label_visibility="collapsed",
             )
 
+    if session.is_full:
+        st.session_state["webcam_open"] = False
+
     if not session.is_full:
-        with st.expander("Use webcam", expanded=False):
+        webcam_open = st.session_state.get("webcam_open", False)
+        st.button(
+            "Close webcam" if webcam_open else "Use webcam",
+            key="webcam_toggle",
+            icon=":material/videocam_off:" if webcam_open else ":material/videocam:",
+            on_click=_toggle_webcam,
+            use_container_width=True,
+        )
+        if webcam_open:
             browser_camera.render(session)
 
     completed = session.status == STATUS_DONE
     return st.button(
-        "Start Over" if completed else "Classify Waste",
+        "Start over" if completed else "Identify waste",
         key="classify_btn",
         type="secondary" if completed else "primary",
+        use_container_width=True,
         icon=":material/refresh:" if completed else None,
         disabled=not session.images,
         on_click=_on_reset if completed else None,

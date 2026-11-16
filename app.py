@@ -17,20 +17,20 @@ if "wastewise_session" not in st.session_state:
 session = st.session_state.wastewise_session
 
 st.markdown(html.header_html(config.classifier_mode() == config.MODE_DEMO), unsafe_allow_html=True)
-left, right = st.columns([1, 1.05], gap="large")
+left, right = st.columns([0.86, 1.14], gap="large")
 with left:
     with st.container(key="left_panel"):
         st.markdown(
-            '<div class="ww-section-head"><div class="ww-section-title">Add your items</div>'
-            '<div class="ww-section-sub">Upload up to five clear photos to get started.</div></div>',
+            '<div class="ww-section-head"><div class="ww-section-title">Add photos</div>'
+            '<div class="ww-section-sub">Choose up to five photos · เลือกได้ไม่เกิน 5 รูป</div></div>',
             unsafe_allow_html=True,
         )
         run_requested = upload_panel.render(session)
 with right:
     with st.container(key="right_panel"):
         st.markdown(
-            '<div class="ww-section-head"><div class="ww-section-title">Sorting guidance</div>'
-            '<div class="ww-section-sub">A simple next step for every item.</div></div>',
+            '<div class="ww-section-head"><div class="ww-section-title">Sorting results</div>'
+            '<div class="ww-section-sub">Material, bin, and prep tips · ประเภทขยะ ถัง และวิธีเตรียม</div></div>',
             unsafe_allow_html=True,
         )
         results_panel.render(session, run_requested)

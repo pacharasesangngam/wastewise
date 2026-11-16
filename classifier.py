@@ -1,9 +1,7 @@
-"""Classification service interface.
+"""Classification service interface for the trained model and UI preview.
 
-The UI talks only to the ``Classifier`` protocol defined here. To connect the
-trained model later, implement ``TrainedModelClassifier.classify`` (or add a new
-class) and return ``ClassificationResult(..., is_demo=False)``. No UI code needs
-to change.
+The UI talks only to the ``Classifier`` protocol defined here. Model mode loads
+the local trained Keras model; demo mode exists only to preview the interface.
 
 ``DemoClassifier`` exists ONLY to preview the results layout. Its output is
 derived from a hash of the image bytes — it does not look at the picture, it is
@@ -14,6 +12,7 @@ from __future__ import annotations
 
 import hashlib
 import io
+import logging
 import os
 import time
 from dataclasses import dataclass
@@ -24,6 +23,8 @@ import numpy as np
 from PIL import Image, ImageOps
 
 from .config import CLASS_LABELS, CLASS_NAMES_PATH, MODE_DEMO, MODE_MODEL, MODEL_PATH
+
+logger = logging.getLogger(__name__)
 
 
 class ClassifierUnavailableError(RuntimeError):
@@ -86,7 +87,7 @@ class DemoClassifier:
 
 
 class TrainedModelClassifier:
-    """Run the selected Keras MobileNetV2 model for one image."""
+    """Run the trained Keras MobileNetV2 model for one image."""
 
     name = "Trained model"
     is_demo = False
@@ -124,11 +125,26 @@ def _load_model():
     try:
         os.environ.setdefault("KERAS_BACKEND", "torch")
         import keras
+        # Models saved by newer Keras releases include this Dense config field.
+        # On older Keras releases it is not a recognized constructor argument.
+        # A null value carries no quantization settings, so strip only that
+        # harmless field while loading; non-null settings still fail visibly.
+        dense_init = keras.layers.Dense.__init__
 
-        return keras.models.load_model(MODEL_PATH, compile=False)
+        def compatible_dense_init(layer, *args, **kwargs):
+            if kwargs.get("quantization_config", object()) is None:
+                kwargs.pop("quantization_config")
+            return dense_init(layer, *args, **kwargs)
+
+        keras.layers.Dense.__init__ = compatible_dense_init
+        try:
+            return keras.models.load_model(MODEL_PATH, compile=False)
+        finally:
+            keras.layers.Dense.__init__ = dense_init
     except Exception as exc:
+        logger.exception("Could not load the trained WasteWise model")
         raise ClassifierUnavailableError(
-            "The trained classification model could not be loaded."
+            "The trained model couldn’t start. Check that its file and required packages are installed."
         ) from exc
 
 

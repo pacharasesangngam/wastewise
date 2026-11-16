@@ -414,10 +414,10 @@ class HtmlAndThemeTests(unittest.TestCase):
     def test_css_is_one_line_with_palette_font_and_upload_texts(self):
         css = theme.style_tag()
         self.assertNotIn("\n", css)
-        for token in ("#397A54", "#EDF4E9", "#FAF8F0", "#263A2D", "Prompt", "family=Prompt"):
+        for token in ("#356B55", "#E4ECE5", "#F5F7F2", "#20362D", "Prompt", "family=Prompt"):
             self.assertIn(token, css)
-        self.assertIn('content:"Upload up to 5 images"', css)
-        self.assertIn('content:"200MB per file (JPG, JPEG, PNG)"', css)
+        self.assertIn('content:"Choose up to 5 photos"', css)
+        self.assertIn('content:"JPG or PNG · up to 200MB each"', css)
         for placeholder in ("__GREEN__", "__SAGE__", "__CREAM__", "__DEEP__", "__PLUS__", "__MAX__", "__LIMIT__"):
             self.assertNotIn(placeholder, css)
 
