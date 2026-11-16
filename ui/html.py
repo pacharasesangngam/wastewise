@@ -10,7 +10,7 @@ from __future__ import annotations
 from html import escape
 
 from ..classifier import ClassificationResult
-from ..config import APP_NAME, MAX_IMAGES, TAGLINE
+from ..config import APP_NAME, MAX_IMAGES
 from ..guidance import get_guidance
 from ..images import SelectedImage
 from . import icons
@@ -28,15 +28,25 @@ def pct(value: float) -> str:
 
 
 def header_html(demo: bool) -> str:
+    mode_badge = (
+        f'<div class="ww-chip ww-chip-demo">{icons.svg("flask-conical", 14)}'
+        "<span><b>Sample mode</b> · preview data</span></div>"
+        if demo
+        else ""
+    )
     return _flat(
         f"""
         <div class="ww-header">
           <div class="ww-logo">{icons.svg("recycle", 24, "#FFFFFF")}</div>
           <div class="ww-brand">
             <div class="ww-title">{escape(APP_NAME)}</div>
-            <div class="ww-tagline">{escape(TAGLINE)}</div>
+            <div class="ww-tagline">From a quick photo to the right bin.</div>
           </div>
           <div class="ww-spacer"></div>
+          <div class="ww-header-meta">
+            <div class="ww-material-count">6 material types</div>
+            {mode_badge}
+          </div>
         </div>
         """
     )

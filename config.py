@@ -25,8 +25,11 @@ DEEP_GREEN = "#263A2D"
 
 MODE_DEMO = "demo"
 MODE_MODEL = "model"
-MODEL_PATH = Path(__file__).resolve().parents[1] / "models" / "trashnet_selected_model.keras"
-CLASS_NAMES_PATH = Path(__file__).resolve().parents[1] / "models" / "class_names.txt"
+MODEL_DIR = Path(
+    os.environ.get("WASTEWISE_MODEL_DIR", Path(__file__).resolve().parent / "models")
+).expanduser()
+MODEL_PATH = MODEL_DIR / "trashnet_selected_model.keras"
+CLASS_NAMES_PATH = MODEL_DIR / "class_names.txt"
 
 
 def classifier_mode() -> str:

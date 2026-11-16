@@ -31,7 +31,7 @@ PLUS_DATA_URI = "data:image/svg+xml;utf8," + quote(_PLUS_SVG, safe="")
 _CSS = """
 :root{
   --ww-green:__GREEN__; --ww-sage:__SAGE__; --ww-cream:__CREAM__; --ww-deep:__DEEP__;
-  --ww-border:#D3E0CE; --ww-muted:#5E7266; --ww-radius:14px;
+  --ww-border:#D3E0CE; --ww-muted:#5E7266; --ww-radius:14px; --ww-amber:#D9A441;
 }
 html, body, .stApp, .stApp *:not([data-testid="stIconMaterial"]):not(svg):not(path){
   font-family:'Prompt',system-ui,-apple-system,'Segoe UI',sans-serif;
@@ -39,21 +39,26 @@ html, body, .stApp, .stApp *:not([data-testid="stIconMaterial"]):not(svg):not(pa
 [data-testid="stIconMaterial"]{font-family:'Material Symbols Rounded','Material Symbols Outlined' !important;}
 .stApp{background:var(--ww-cream); color:var(--ww-deep);}
 header[data-testid="stHeader"], [data-testid="stToolbar"], [data-testid="stDecoration"], footer, #MainMenu{display:none !important;}
-.block-container{padding:1.1rem 1.5rem 1rem !important; max-width:1320px;}
+.block-container{padding:1.25rem 1.6rem 1.5rem !important; max-width:1440px;}
 
 /* Header */
-.ww-header{display:flex; align-items:center; gap:.75rem; padding-bottom:.9rem; margin-bottom:.9rem; border-bottom:1px solid var(--ww-border);}
-.ww-logo{width:42px; height:42px; border-radius:12px; background:var(--ww-green); display:flex; align-items:center; justify-content:center; flex:none;}
-.ww-title{font-size:1.35rem; font-weight:700; line-height:1.1; color:var(--ww-deep);}
-.ww-tagline{font-size:.85rem; color:var(--ww-muted); margin-top:2px;}
+.ww-header{display:flex; align-items:center; gap:.85rem; padding:.2rem 0 1.1rem; margin-bottom:1.2rem; border-bottom:1px solid var(--ww-border);}
+.ww-logo{width:46px; height:46px; border-radius:15px 15px 15px 5px; background:var(--ww-green); display:flex; align-items:center; justify-content:center; flex:none;}
+.ww-title{font-size:1.45rem; font-weight:700; line-height:1.1; color:var(--ww-deep); letter-spacing:-.025em;}
+.ww-tagline{font-size:.85rem; color:var(--ww-muted); margin-top:4px;}
 .ww-spacer{flex:1;}
+.ww-header-meta{display:flex; align-items:center; justify-content:flex-end; gap:.65rem;}
+.ww-material-count{font-size:.8rem; color:var(--ww-muted); padding-right:.7rem; border-right:1px solid var(--ww-border);}
 .ww-chip{display:inline-flex; align-items:center; gap:.4rem; padding:.3rem .65rem; border-radius:999px; font-size:.78rem; line-height:1.3;}
-.ww-chip-demo{background:#FFF3D6; color:#6B4A00; border:1px solid #F0D79A;}
+.ww-chip-demo{background:#FFF5DC; color:#654700; border:1px solid #E8CB83;}
 .ww-chip svg{flex:none;}
+.ww-section-head{margin:0 0 .85rem;}
+.ww-section-title{font-size:1.08rem; font-weight:650; letter-spacing:-.015em; color:var(--ww-deep);}
+.ww-section-sub{font-size:.8rem; color:var(--ww-muted); margin-top:.12rem;}
 
 /* Panels */
-.st-key-left_panel{gap:.7rem !important; padding-right:1.25rem; border-right:1px solid var(--ww-border); min-height:calc(100vh - 9rem);}
-.st-key-right_panel{padding-left:.5rem; gap:.8rem !important;}
+.st-key-left_panel{gap:.8rem !important; padding:1rem 1.1rem 1.2rem; border:1px solid var(--ww-border); border-top:3px solid var(--ww-green); border-radius:4px 4px 16px 16px; background:#fff; min-height:calc(100vh - 9rem);}
+.st-key-right_panel{padding:1rem 1.1rem 1.2rem; gap:1rem !important; border:1px solid var(--ww-border); border-top:3px solid #C8D9C7; border-radius:4px 4px 16px 16px; background:#fff; min-height:calc(100vh - 9rem);}
 
 /* Upload area */
 .st-key-upload_area_grid{padding:.8rem !important; border:2px dashed var(--ww-green) !important; border-radius:var(--ww-radius) !important; background:var(--ww-sage);}
@@ -117,9 +122,13 @@ header[data-testid="stHeader"], [data-testid="stToolbar"], [data-testid="stDecor
 .st-key-classify_btn button{width:100%; min-height:3rem; border-radius:12px; border:none; background:var(--ww-green); color:#fff; font-size:1rem; font-weight:600; letter-spacing:.01em;}
 .st-key-classify_btn button:hover:not(:disabled){background:#2F6747; color:#fff;}
 .st-key-classify_btn button:disabled{background:var(--ww-green); opacity:.4; color:#fff;}
+.st-key-classify_btn button:focus-visible,
+[data-testid="stFileUploaderDropzone"] button:focus-visible,
+[class*="st-key-rm_"] button:focus-visible,
+[class*="st-key-dismiss_notices"] button:focus-visible{outline:3px solid var(--ww-amber) !important; outline-offset:3px;}
 
 /* Results */
-.ww-state{display:flex; flex-direction:column; align-items:center; text-align:center; gap:.35rem; padding:4.5rem 1rem; border:1px dashed var(--ww-border); border-radius:var(--ww-radius); background:rgba(237,244,233,.5);}
+.ww-state{display:flex; flex-direction:column; align-items:center; text-align:center; gap:.35rem; padding:4.5rem 1rem; border:1px dashed var(--ww-border); border-radius:var(--ww-radius); background:linear-gradient(145deg,#F5F8F1,#FBFCF9);}
 .ww-state-icon{width:56px; height:56px; border-radius:16px; background:var(--ww-sage); color:var(--ww-green); display:flex; align-items:center; justify-content:center; margin-bottom:.3rem;}
 .ww-state-title{font-weight:600; font-size:1.05rem;}
 .ww-state-sub{font-size:.88rem; color:var(--ww-muted); max-width:34rem;}
@@ -170,13 +179,19 @@ header[data-testid="stHeader"], [data-testid="stToolbar"], [data-testid="stDecor
 @media (max-width: 900px){
   .ww-chip-detail{display:none;}
   .block-container{padding:.9rem 1rem !important;}
+  .st-key-left_panel{padding:.9rem; min-height:0;}
+  .st-key-right_panel{padding:.9rem; min-height:0;}
 }
 @media (max-width: 640px){
-  .st-key-left_panel{border-right:0; border-bottom:1px solid var(--ww-border); padding-right:0; padding-bottom:1.1rem; min-height:0;}
-  .st-key-right_panel{padding-left:0;}
+  .ww-header{align-items:flex-start; flex-wrap:wrap;}
+  .ww-header-meta{width:100%; padding-left:3.4rem; justify-content:flex-start;}
+  .ww-material-count{display:none;}
+  .st-key-left_panel{border-radius:4px 4px 14px 14px; padding:.75rem;}
+  .st-key-right_panel{padding:.75rem;}
   .ww-score{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) 3rem; gap:.5rem;}
   .ww-material-en{font-size:1.45rem;}
 }
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{scroll-behavior:auto !important; transition:none !important; animation:none !important;}}
 """
 
 

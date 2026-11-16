@@ -6,6 +6,7 @@ import streamlit as st
 
 from ..config import ALLOWED_EXTENSIONS
 from ..session import STATUS_DONE, WasteWiseSession
+from . import browser_camera
 from . import html
 
 
@@ -90,6 +91,10 @@ def render(session: WasteWiseSession) -> bool:
                 args=(session,),
                 label_visibility="collapsed",
             )
+
+    if not session.is_full:
+        with st.expander("Use webcam", expanded=False):
+            browser_camera.render(session)
 
     completed = session.status == STATUS_DONE
     return st.button(
