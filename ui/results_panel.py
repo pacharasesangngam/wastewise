@@ -8,7 +8,7 @@ from .. import config
 from ..classifier import get_classifier
 from ..session import STATUS_DONE, STATUS_ERROR, WasteWiseSession
 from ..guidance import get_guidance
-from . import html
+from . import html, icons
 
 
 def _run_classification(session: WasteWiseSession) -> None:
@@ -71,15 +71,28 @@ def render_results(session: WasteWiseSession, demo: bool) -> None:
                         st.markdown(html.scores_html(result), unsafe_allow_html=True)
     with side:
         with st.container(key="bins_summary"):
-            st.markdown('<div class="ww-side-title">Your bins</div><div class="ww-side-th">สรุปถังที่ใช้</div>', unsafe_allow_html=True)
             counts = {}
             for _, _, result in entries:
                 counts[result.predicted] = counts.get(result.predicted, 0) + 1
+            bin_summary = (
+                f'<div class="ww-side-title">Your bins</div>'
+                f'<div class="ww-bin-total"><span>{len(entries)} items into {len(counts)} bins</span>'
+                f'<span>{len(entries)} ชิ้น แยกลง {len(counts)} ถัง</span></div>'
+            )
+            st.markdown(bin_summary, unsafe_allow_html=True)
             for label, amount in counts.items():
                 g = get_guidance(label)
-                st.markdown(f'<div class="ww-bin-count"><span>{g.name_en} · {g.name_th}</span><b>{amount}</b></div>', unsafe_allow_html=True)
-            st.button("Add more photos", key="add_more", type="primary", use_container_width=True, on_click=lambda: setattr(st.session_state, "wastewise_view", "upload"))
-            if st.button("Start over", key="start_over", use_container_width=True):
+                icon = icons.svg(g.material_icon, 20, "#FFFFFF")
+                st.markdown(
+                    f'<div class="ww-bin-row" style="--material:{g.accent}">'
+                    f'<span class="ww-bin-icon">{icon}</span>'
+                    f'<span class="ww-bin-label"><b>{g.name_en}</b><small>{g.name_th}</small></span>'
+                    f'<strong>{amount}</strong></div>',
+                    unsafe_allow_html=True,
+                )
+            st.markdown('<div class="ww-bin-divider"></div>', unsafe_allow_html=True)
+            st.button("Add more photos", key="add_more", icon=":material/add_a_photo:", type="primary", use_container_width=True, on_click=lambda: setattr(st.session_state, "wastewise_view", "upload"))
+            if st.button("Start over", key="start_over", icon=":material/restart_alt:", use_container_width=True):
                 session.reset()
                 st.session_state.wastewise_view = "upload"
                 st.session_state.webcam_open = False

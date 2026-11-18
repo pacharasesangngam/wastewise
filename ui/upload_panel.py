@@ -58,8 +58,9 @@ def render(session: WasteWiseSession) -> bool:
                 if not session.is_full:
                     tiles.append(None)
                 for start in range(0, len(tiles), 3):
-                    cols = st.columns(3, gap="small")
-                    for col, img in zip(cols, tiles[start : start + 3]):
+                    row_tiles = tiles[start : start + 3]
+                    cols = st.columns(len(row_tiles), gap="small")
+                    for col, img in zip(cols, row_tiles):
                         with col:
                             if img is None:
                                 with st.container(key="add_image_tile"):
@@ -90,7 +91,7 @@ def render_camera(session: WasteWiseSession) -> bool:
     with head_brand:
         st.markdown(html.camera_brand_html(), unsafe_allow_html=True)
     with head_close:
-        st.button("Close camera · ปิดกล้อง", key="camera_close", on_click=lambda: setattr(st.session_state, "webcam_open", False), use_container_width=True)
+        st.button("×", key="camera_close", help="Close camera · ปิดกล้อง", on_click=lambda: setattr(st.session_state, "webcam_open", False), use_container_width=True)
     frame, queue = st.columns([3, 1], gap="large")
     with frame:
         with st.container(key="camera_frame"):
